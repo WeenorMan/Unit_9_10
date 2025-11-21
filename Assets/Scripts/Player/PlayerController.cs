@@ -6,18 +6,35 @@ public class PlayerController : MonoBehaviour
 
     public float speed = 5f;
 
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        playerControls = PlayerControls.instance; 
+        playerControls = PlayerControls.instance;
     }
 
-    // Update is called once per frame
     void Update()
     {
         
     }
 
+    void FixedUpdate()
+    {
+        if (playerControls != null)
+        {
+            float moveDirection = 0f;
 
+            if (playerControls.rightPress)
+                moveDirection += 1f;
+            if (playerControls.leftPress)
+                moveDirection -= 1f;
+
+            MovePlayer(moveDirection);
+        }
+    }
+
+    void MovePlayer(float moveDirection)
+    {
+        Vector3 currentPosition = transform.position;
+        currentPosition.x += moveDirection * speed * Time.fixedDeltaTime;
+        transform.position = currentPosition;
+    }
 }

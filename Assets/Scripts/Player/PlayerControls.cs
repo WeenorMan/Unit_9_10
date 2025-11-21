@@ -4,9 +4,9 @@ public class PlayerControls : MonoBehaviour
 {
     public static PlayerControls instance;
 
-    bool rightPress;
-    bool leftPress;
-    bool actionPress;
+    public bool rightPress;
+    public bool leftPress;
+    public bool actionPress;
 
     private void Awake()
     {
