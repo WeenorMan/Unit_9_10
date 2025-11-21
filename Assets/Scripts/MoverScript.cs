@@ -4,10 +4,12 @@ public class MoverScript : MonoBehaviour
 {
 
     public GameObject[] enemyList;
-
     int enemyCount;
     int enemyToMove;
     float direction;
+    float rightLimit = 1.9f;
+    float leftLimit = -1.9f;
+    bool requestDirectionChange;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -16,32 +18,54 @@ public class MoverScript : MonoBehaviour
         enemyCount = enemyList.Length;
         enemyToMove = 0;
         direction = 0.1f;
+        requestDirectionChange = false;
+        InvokeRepeating("DoMove", 0.1f, 0.1f);
     }
 
     // Update is called once per frame
     void Update()
     {
-        DoMove();
+        //DoMove();
         
     }
 
 
     void DoMove()
     {
+        print("moving enemy " + enemyToMove);
+
         //X axis = 1.98 and -1.98
 
         GameObject obj = enemyList[enemyToMove];
 
-        obj.transform.position = new Vector3(obj.transform.position.x + direction, 0, 0);
+        obj.transform.position = new Vector3(obj.transform.position.x + direction, obj.transform.position.y, 0);
 
         //check for enemy reaching far left or far right
 
-        //jump down one line
+        if (obj.transform.position.x >= rightLimit || obj.transform.position.x <= leftLimit)
+        {
+
+            requestDirectionChange = true;
+        }
 
         enemyToMove++;
-        if( enemyToMove > enemyCount )
+        if( enemyToMove >= enemyCount )
         {
             enemyToMove = 0;
+
+            if (requestDirectionChange == true)
+            {
+                requestDirectionChange = false;
+                direction = -direction;
+
+                //jump down one line
+                foreach (GameObject enemy in enemyList)
+                {
+                    enemy.transform.position += new Vector3(0, -0.25f, 0);
+                }
+            }
+
+
         }
 
     }
