@@ -2,39 +2,67 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public GameObject laser;
     PlayerControls playerControls;
+    Rigidbody2D rb;
 
     public float speed = 5f;
+    
+    public float cooldown;
+    float lastShot;
 
     void Start()
     {
         playerControls = PlayerControls.instance;
+        rb = GetComponent<Rigidbody2D>();
+
     }
+
+  
 
     void Update()
     {
-        
-    }
+        rb.linearVelocity = new Vector3(0, 0, 0);
 
-    void FixedUpdate()
-    {
         if (playerControls != null)
         {
-            float moveDirection = 0f;
 
             if (playerControls.rightPress)
-                moveDirection += 1f;
+            {
+                rb.linearVelocity = new Vector3(1, 0, 0);
+            }
             if (playerControls.leftPress)
-                moveDirection -= 1f;
+            {
+                rb.linearVelocity = new Vector3(-1, 0, 0);
 
-            MovePlayer(moveDirection);
+            }
+
         }
+
+        ShootProjectile();
     }
 
-    void MovePlayer(float moveDirection)
+    void ShootProjectile()
     {
-        Vector3 currentPosition = transform.position;
-        currentPosition.x += moveDirection * speed * Time.fixedDeltaTime;
-        transform.position = currentPosition;
+        if(playerControls != null)
+        {
+            if (playerControls.actionPress)
+            {
+                GameObject clone;
+                clone = Instantiate(laser, transform.position, transform.rotation);
+
+
+                Rigidbody2D rb = clone.GetComponent<Rigidbody2D>();
+
+                rb.linearVelocity = new Vector2(0, 5);
+
+
+                rb.transform.position = new Vector3(transform.position.x, transform.position.y +
+                0.5f, transform.position.z + 1);
+
+            }
+        }
+
+        
     }
 }
