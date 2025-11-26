@@ -1936,6 +1936,8 @@ MonoBehaviour:
   - {fileID: 1307326479}
   - {fileID: 1291394271}
   - {fileID: 1059547343}
+  enemyCount: 0
+  direction: 0.1
 --- !u!4 &1045786974
 Transform:
   m_ObjectHideFlags: 0
