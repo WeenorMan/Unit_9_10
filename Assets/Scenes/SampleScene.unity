@@ -565,7 +565,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   laser: {fileID: 5413566424802209308, guid: e1cdeee12a0466d41ac6feb6059626d3, type: 3}
   speed: 2
-  cooldown: 0
+  cooldown: 0.5
 --- !u!70 &368316277
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

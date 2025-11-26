@@ -6,8 +6,10 @@ public class PlayerController : MonoBehaviour
     PlayerControls playerControls;
     Rigidbody2D rb;
 
+    [Header("Player Settings")]
     public float speed = 5f;
-    
+
+    [Header("Weapon Settings")]
     public float cooldown;
     float lastShot;
 
@@ -44,10 +46,17 @@ public class PlayerController : MonoBehaviour
 
     void ShootProjectile()
     {
+        
+
         if(playerControls != null)
         {
             if (playerControls.actionPress)
             {
+                if (Time.time - lastShot < cooldown)
+                {
+                    return;
+                }
+
                 GameObject clone;
                 clone = Instantiate(laser, transform.position, transform.rotation);
 
@@ -59,6 +68,8 @@ public class PlayerController : MonoBehaviour
 
                 rb.transform.position = new Vector3(transform.position.x, transform.position.y +
                 0.5f, transform.position.z + 1);
+
+                lastShot = Time.time;
 
             }
         }
