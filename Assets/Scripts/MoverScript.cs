@@ -62,15 +62,9 @@ public class MoverScript : MonoBehaviour
             }
         }
 
-        if(enemyCount <= 10)
-        {
-            obj.transform.position = new Vector3(obj.transform.position.x + direction * 2, obj.transform.position.y, 0);
-        }
+       
 
-        if (enemyCount <= 0)
-        {
-            CancelInvoke("DoMove");
-        }
+        
 
     }
 
