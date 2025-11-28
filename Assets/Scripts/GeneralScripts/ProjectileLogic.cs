@@ -2,27 +2,18 @@ using UnityEngine;
 
 public class ProjectileLogic : MonoBehaviour
 {
-    PlayerController playerController;
+    public Vector3 direction;
+    public float speed;
+    public System.Action destroyed;
 
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
     void Update()
     {
-        if(transform.position.y >= 4)
-        {
-            Destroy(gameObject);
-        }
+        this.transform.position += this.direction * this.speed * Time.deltaTime;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        //if( collision.gameObject)
-        
+        this.destroyed.Invoke();
+        Destroy(this.gameObject);
     }
 }

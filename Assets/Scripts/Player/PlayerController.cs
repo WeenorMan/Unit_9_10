@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public GameObject laser;
+    public ProjectileLogic laserPrefab;
     PlayerControls playerControls;
-    Rigidbody2D rb;
+    private bool laserActive;
 
     [Header("Player Settings")]
-    public float speed = 5f;
+    public float speed;
 
     [Header("Weapon Settings")]
     public float cooldown;
@@ -16,64 +16,52 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         playerControls = PlayerControls.instance;
-        rb = GetComponent<Rigidbody2D>();
-
     }
-
   
-
     void Update()
     {
-        rb.linearVelocity = new Vector3(0, 0, 0);
-
         if (playerControls != null)
         {
-
             if (playerControls.rightPress)
             {
-                rb.linearVelocity = new Vector3(1, 0, 0);
+                this.transform.position += Vector3.right * this.speed * Time.deltaTime;
             }
             if (playerControls.leftPress)
             {
-                rb.linearVelocity = new Vector3(-1, 0, 0);
+                this.transform.position += Vector3.left * this.speed * Time.deltaTime;
 
             }
-
         }
 
-        ShootProjectile();
-    }
-
-    void ShootProjectile()
-    {
-        
-
-        if(playerControls != null)
+        if (playerControls != null)
         {
             if (playerControls.actionPress)
             {
+
+                ShootProjectile();
+
                 if (Time.time - lastShot < cooldown)
                 {
                     return;
                 }
-
-                GameObject clone;
-                clone = Instantiate(laser, transform.position, transform.rotation);
-
-
-                Rigidbody2D rb = clone.GetComponent<Rigidbody2D>();
-
-                rb.linearVelocity = new Vector2(0, 5);
-
-
-                rb.transform.position = new Vector3(transform.position.x, transform.position.y +
-                0.5f, transform.position.z + 1);
-
-                lastShot = Time.time;
-
             }
         }
+    }
 
-        
+    void ShootProjectile()
+    {
+        if (!laserActive)
+        {
+            ProjectileLogic projectile = Instantiate(this.laserPrefab, this.transform.position, Quaternion.identity);
+            projectile.destroyed += LaserDestroyed;
+            laserActive = true;
+            AudioManager.instance.PlaySFXClip(0, 1);
+            lastShot = Time.time;
+        }
+    }
+
+    void LaserDestroyed()
+    {
+        laserActive = false;
     }
 }

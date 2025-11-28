@@ -44,7 +44,9 @@ public class AlienManager : MonoBehaviour
 
     void DoMove()
     {
+
         if (alienList.Count == 0) return;
+
 
         Alien alien = alienList[alienToMove];
         alien.transform.localPosition = new Vector3(alien.transform.localPosition.x + direction, alien.transform.localPosition.y, 0);

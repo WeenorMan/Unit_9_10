@@ -22,23 +22,6 @@ public class Alien : MonoBehaviour
         InvokeRepeating(nameof(AnimateSprite), this.animationTime, this.animationTime);
     }
 
-    void Update()
-    {
-        
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if( collision.gameObject.tag == "bullet" && dead==false)
-        {
-            Destroy(collision.gameObject);
-            gameObject.GetComponent<SpriteRenderer>().enabled = false;
-            gameObject.GetComponent<BoxCollider2D>().enabled = false;
-            dead = true;
-            
-            
-        }
-    }
 
     private void AnimateSprite()
     {
@@ -51,4 +34,13 @@ public class Alien : MonoBehaviour
 
         spriteRenderer.sprite = this.animationSprites[animationFrame];
     }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if(other.gameObject.layer == LayerMask.NameToLayer("Laser"))
+        {
+            this.gameObject.SetActive(false);
+        }
+    }
 }
+
