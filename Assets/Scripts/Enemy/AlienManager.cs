@@ -6,8 +6,13 @@ public class AlienManager : MonoBehaviour
     public Alien[] prefabs;
     public int rows = 5;
     public int columns = 6;
+    public AnimationCurve speed;
+    private float currentInterval = 0.1f;
+    public int aliensKilled { get; private set; }
+    public int totalAliens => rows * columns;
+    public float percentKilled => (float)aliensKilled / (float)totalAliens;
 
-    [SerializeField] float direction = 0.1f;
+    [SerializeField] float direction;
     float rightLimit = 1.9f;
     float leftLimit = -1.9f;
     bool requestDirectionChange;
@@ -27,6 +32,7 @@ public class AlienManager : MonoBehaviour
             for (int col = 0; col < this.columns; col++)
             {
                 Alien alien = Instantiate(this.prefabs[row], this.transform);
+                alien.killed += AlienKilled;
                 Vector3 position = rowPosition;
                 position.x += col * 0.6f;
                 alien.transform.localPosition = position;
@@ -39,17 +45,26 @@ public class AlienManager : MonoBehaviour
     {
         requestDirectionChange = false;
         alienToMove = 0;
-        InvokeRepeating("DoMove", 0.1f, 0.1f);
+        currentInterval = speed.Evaluate(percentKilled);
+       // InvokeRepeating("DoMove", currentInterval, currentInterval);
+    }
+
+    private void Update()
+    {
+        DoMove();
     }
 
     void DoMove()
     {
-
         if (alienList.Count == 0) return;
 
-
         Alien alien = alienList[alienToMove];
-        alien.transform.localPosition = new Vector3(alien.transform.localPosition.x + direction, alien.transform.localPosition.y, 0);
+        // Move by fixed amount each step
+        alien.transform.localPosition = new Vector3(
+            alien.transform.localPosition.x + direction,
+            alien.transform.localPosition.y,
+            0
+        );
 
         if (alien.transform.localPosition.x >= rightLimit || alien.transform.localPosition.x <= leftLimit)
         {
@@ -71,6 +86,19 @@ public class AlienManager : MonoBehaviour
                     a.transform.localPosition += new Vector3(0, -0.25f, 0);
                 }
             }
+        }
+    }
+
+    public void AlienKilled()
+    {
+        aliensKilled++;
+
+        float newInterval = Mathf.Clamp(speed.Evaluate(percentKilled), 0.02f, 10f);
+        if (Mathf.Abs(newInterval - currentInterval) > 0.001f)
+        {
+            currentInterval = newInterval;
+            CancelInvoke("DoMove");
+            InvokeRepeating("DoMove", currentInterval, currentInterval);
         }
     }
 }

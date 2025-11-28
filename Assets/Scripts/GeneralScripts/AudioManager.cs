@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 
 
@@ -20,6 +22,7 @@ public class AudioManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
     }
 
     private void Start()
@@ -46,9 +49,22 @@ public class AudioManager : MonoBehaviour
     }
 
     
-    public void PlayMusicClip()
+    public void PlayMusicClip(int index, float volume)
     {
-        
+        AudioClip clip = null;
+
+        for (int i = 0; i < musicClips.Length; i++)
+        {
+            if (i == index)
+            {
+                if (musicClips[i] == null) return;
+
+                clip = musicClips[i];
+                break;
+            }
+        }
+
+        musicSource.PlayOneShot(clip,volume);
     }
     public void StopMusicClip()
     {

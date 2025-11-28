@@ -6,6 +6,7 @@ public class Alien : MonoBehaviour
 {
     public Sprite[] animationSprites;
     public float animationTime = 1f;
+    public System.Action killed;
     bool dead;
 
     private SpriteRenderer spriteRenderer;
@@ -39,6 +40,7 @@ public class Alien : MonoBehaviour
     {
         if(other.gameObject.layer == LayerMask.NameToLayer("Laser"))
         {
+            this.killed.Invoke();
             this.gameObject.SetActive(false);
         }
     }
