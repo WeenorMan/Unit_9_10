@@ -6,8 +6,10 @@ public class AlienManager : MonoBehaviour
     public Alien[] prefabs;
     public int rows = 5;
     public int columns = 6;
-    public AnimationCurve speed;
-    private float currentInterval = 0.1f;
+    //public AnimationCurve speed;
+    public float currentInterval = 0.0001f;
+    public float intervalTimer = 0.0f;
+
     public int aliensKilled { get; private set; }
     public int totalAliens => rows * columns;
     public float percentKilled => (float)aliensKilled / (float)totalAliens;
@@ -45,21 +47,46 @@ public class AlienManager : MonoBehaviour
     {
         requestDirectionChange = false;
         alienToMove = 0;
-        currentInterval = speed.Evaluate(percentKilled);
-       // InvokeRepeating("DoMove", currentInterval, currentInterval);
+        currentInterval = 0.04f; // speed.Evaluate(percentKilled);
+        //InvokeRepeating("DoMove", 0, currentInterval);
     }
 
     private void Update()
     {
         DoMove();
+
+        /*if( PlayerControls.instance.leftPress)
+        {
+            currentInterval -= 0.0001f;
+        }
+
+        if (PlayerControls.instance.rightPress)
+        {
+            currentInterval += 0.0001f;
+        }*/
+
+        //print("ci=" + currentInterval);
+
+
     }
 
     void DoMove()
     {
+        intervalTimer -= Time.deltaTime;
+        if (intervalTimer < 0)
+        {
+            intervalTimer = currentInterval;
+        }
+        else
+        {
+            return;
+        }
+
+
         if (alienList.Count == 0) return;
 
         Alien alien = alienList[alienToMove];
-        // Move by fixed amount each step
+
         alien.transform.localPosition = new Vector3(
             alien.transform.localPosition.x + direction,
             alien.transform.localPosition.y,
@@ -93,12 +120,22 @@ public class AlienManager : MonoBehaviour
     {
         aliensKilled++;
 
+        currentInterval -= 0.003f;
+
+
+        if (aliensKilled >= totalAliens)
+        {
+            Debug.Log("All aliens killed!");
+        }
+
+        /*
         float newInterval = Mathf.Clamp(speed.Evaluate(percentKilled), 0.02f, 10f);
         if (Mathf.Abs(newInterval - currentInterval) > 0.001f)
         {
-            currentInterval = newInterval;
-            CancelInvoke("DoMove");
-            InvokeRepeating("DoMove", currentInterval, currentInterval);
+            //currentInterval = newInterval;
         }
+        //CancelInvoke("DoMove");
+        //InvokeRepeating("DoMove", currentInterval, currentInterval);
+        */
     }
 }

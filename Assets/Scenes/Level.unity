@@ -924,30 +924,8 @@ MonoBehaviour:
   - {fileID: 5059412815766601539, guid: e8d7ed1b5eb8f114d8671a2c27b7f30b, type: 3}
   rows: 5
   columns: 6
-  speed:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0.2
-      inSlope: 2
-      outSlope: 2
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 0.07
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+  currentInterval: 0.0001
+  intervalTimer: 0
   direction: 0.1
 --- !u!4 &816090593
 Transform:
