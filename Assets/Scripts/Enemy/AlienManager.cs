@@ -1,13 +1,13 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class AlienManager : MonoBehaviour
 {
     public Alien[] prefabs;
     public int rows = 5;
     public int columns = 6;
-    //public AnimationCurve speed;
-    public float currentInterval = 0.0001f;
+    public float speed = 0.0001f;
     public float intervalTimer = 0.0f;
 
     public int aliensKilled { get; private set; }
@@ -47,27 +47,12 @@ public class AlienManager : MonoBehaviour
     {
         requestDirectionChange = false;
         alienToMove = 0;
-        currentInterval = 0.04f; // speed.Evaluate(percentKilled);
-        //InvokeRepeating("DoMove", 0, currentInterval);
+        speed = 0.04f; 
     }
 
     private void Update()
     {
         DoMove();
-
-        /*if( PlayerControls.instance.leftPress)
-        {
-            currentInterval -= 0.0001f;
-        }
-
-        if (PlayerControls.instance.rightPress)
-        {
-            currentInterval += 0.0001f;
-        }*/
-
-        //print("ci=" + currentInterval);
-
-
     }
 
     void DoMove()
@@ -75,17 +60,18 @@ public class AlienManager : MonoBehaviour
         intervalTimer -= Time.deltaTime;
         if (intervalTimer < 0)
         {
-            intervalTimer = currentInterval;
+            intervalTimer = speed;
         }
         else
         {
             return;
         }
 
-
         if (alienList.Count == 0) return;
 
-        Alien alien = alienList[alienToMove];
+        Alien alien;
+        
+        alien = alienList[alienToMove];
 
         alien.transform.localPosition = new Vector3(
             alien.transform.localPosition.x + direction,
@@ -98,7 +84,20 @@ public class AlienManager : MonoBehaviour
             requestDirectionChange = true;
         }
 
-        alienToMove++;
+        while(true)
+        { 
+            alienToMove++;
+            if( alienToMove >= 30 )
+            {
+                break;
+            }
+            alien = alienList[alienToMove];
+            if (alien.gameObject.activeSelf)
+            {
+                break;
+            }
+        }
+
         if (alienToMove >= alienList.Count)
         {
             alienToMove = 0;
@@ -120,22 +119,26 @@ public class AlienManager : MonoBehaviour
     {
         aliensKilled++;
 
-        currentInterval -= 0.003f;
-
+        speed *= 0.9f;
+        speed = Mathf.Max(0.01f, speed - 0.01f);
 
         if (aliensKilled >= totalAliens)
         {
             Debug.Log("All aliens killed!");
         }
+    }
 
-        /*
-        float newInterval = Mathf.Clamp(speed.Evaluate(percentKilled), 0.02f, 10f);
-        if (Mathf.Abs(newInterval - currentInterval) > 0.001f)
-        {
-            //currentInterval = newInterval;
-        }
-        //CancelInvoke("DoMove");
-        //InvokeRepeating("DoMove", currentInterval, currentInterval);
-        */
+    private void OnGUI()
+    {
+        string text = " ";
+
+        text += "\nFPS:" + 1/Time.deltaTime;
+
+        // define debug text area
+        GUI.contentColor = Color.white;
+        GUILayout.BeginArea(new Rect(10f, 10f, 1600f, 1600f));
+        GUILayout.Label($"<size=24>{text}</size>");
+        GUILayout.EndArea();
+
     }
 }

@@ -7,7 +7,6 @@ public class Alien : MonoBehaviour
     public Sprite[] animationSprites;
     public float animationTime = 1f;
     public System.Action killed;
-    bool dead;
 
     private SpriteRenderer spriteRenderer;
     private int animationFrame;
@@ -19,10 +18,8 @@ public class Alien : MonoBehaviour
 
     void Start()
     {
-        dead = false;
         InvokeRepeating(nameof(AnimateSprite), this.animationTime, this.animationTime);
     }
-
 
     private void AnimateSprite()
     {
