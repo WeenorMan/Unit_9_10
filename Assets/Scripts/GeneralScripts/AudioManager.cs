@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 
-
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager instance;

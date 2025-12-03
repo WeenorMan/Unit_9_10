@@ -2,18 +2,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SocialPlatforms.Impl;
 
+
 public class AlienManager : MonoBehaviour
 {
+    [Header("Alien Settings")]
     public Alien[] prefabs;
     public int rows = 5;
     public int columns = 6;
     public float speed = 0.0001f;
     public float intervalTimer = 0.0f;
 
+    [Header("Attack Settings")]
+    public float missileAttackRate = 1.0f;
+    public ProjectileLogic missilePrefab;
+
+    [Header("Game Stats")]
     public int aliensKilled { get; private set; }
+    public int amountAlive => this.totalAliens - this.aliensKilled;
+    public int waveNumber { get; private set; }
     public int totalAliens => rows * columns;
     public float percentKilled => (float)aliensKilled / (float)totalAliens;
 
+    [Header("Movement Variables")]
     [SerializeField] float direction;
     float rightLimit = 1.9f;
     float leftLimit = -1.9f;
@@ -22,6 +32,24 @@ public class AlienManager : MonoBehaviour
     int alienToMove = 0;
 
     private void Awake()
+    {
+        SpawnAliens();
+    }
+
+    private void Start()
+    {
+        requestDirectionChange = false;
+        alienToMove = 0;
+        speed = 0.04f; 
+
+        InvokeRepeating(nameof(MissleAttack), this.missileAttackRate, this.missileAttackRate);
+    }
+
+    private void Update()
+    {
+        DoMove();
+    }
+    void SpawnAliens()
     {
         for (int row = 0; row < this.rows; row++)
         {
@@ -41,18 +69,6 @@ public class AlienManager : MonoBehaviour
                 alienList.Add(alien);
             }
         }
-    }
-
-    private void Start()
-    {
-        requestDirectionChange = false;
-        alienToMove = 0;
-        speed = 0.04f; 
-    }
-
-    private void Update()
-    {
-        DoMove();
     }
 
     void DoMove()
@@ -87,7 +103,7 @@ public class AlienManager : MonoBehaviour
         while(true)
         { 
             alienToMove++;
-            if( alienToMove >= 30 )
+            if( alienToMove >= alienList.Count )
             {
                 break;
             }
@@ -115,6 +131,23 @@ public class AlienManager : MonoBehaviour
         }
     }
 
+    private void MissleAttack()
+    {
+        foreach (Alien a in alienList)
+        {
+            if (!a.gameObject.activeInHierarchy )
+            {
+                continue;
+            }
+
+            if(Random.value < (1.0f / (float)this.amountAlive))
+            {
+                Instantiate(this.missilePrefab, a.transform.position, Quaternion.identity);
+                break;
+            }
+        }
+    }
+
     public void AlienKilled()
     {
         aliensKilled++;
@@ -125,6 +158,25 @@ public class AlienManager : MonoBehaviour
         if (aliensKilled >= totalAliens)
         {
             Debug.Log("All aliens killed!");
+
+            foreach (Alien a in alienList)
+            {
+                if (a != null)
+                {
+                    Destroy(a.gameObject);
+                }
+            }
+            alienList.Clear();
+
+            waveNumber++;
+
+            speed = 0.04f;
+            direction = 0.1f;
+
+            aliensKilled = 0;
+            alienToMove = 0;
+
+            SpawnAliens();
         }
     }
 
@@ -139,6 +191,5 @@ public class AlienManager : MonoBehaviour
         GUILayout.BeginArea(new Rect(10f, 10f, 1600f, 1600f));
         GUILayout.Label($"<size=24>{text}</size>");
         GUILayout.EndArea();
-
     }
 }

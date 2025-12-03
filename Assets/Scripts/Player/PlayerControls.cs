@@ -13,11 +13,18 @@ public class PlayerControls : MonoBehaviour
         if(instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(this);
         }
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (instance == this)
+        {
+            instance = null;
         }
     }
 

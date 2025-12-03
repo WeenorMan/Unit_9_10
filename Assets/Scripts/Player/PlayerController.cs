@@ -1,13 +1,17 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
     public ProjectileLogic laserPrefab;
     PlayerControls playerControls;
+    ScoreManager scoreManager;
     private bool laserActive;
+    public System.Action killed;
 
     [Header("Player Settings")]
     public float speed;
+    public int lives = 2;
 
     [Header("Weapon Settings")]
     public float cooldown;
@@ -15,7 +19,14 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        playerControls = PlayerControls.instance;
+        if(PlayerControls.instance == null)
+        {
+            playerControls = FindFirstObjectByType<PlayerControls>();
+        }
+        else
+        {
+            playerControls = PlayerControls.instance;
+        }
     }
   
     void Update()
@@ -29,7 +40,6 @@ public class PlayerController : MonoBehaviour
             if (playerControls.leftPress)
             {
                 this.transform.position += Vector3.left * this.speed * Time.deltaTime;
-
             }
         }
 
@@ -37,13 +47,12 @@ public class PlayerController : MonoBehaviour
         {
             if (playerControls.actionPress)
             {
-
-                ShootProjectile();
-
                 if (Time.time - lastShot < cooldown)
                 {
                     return;
                 }
+                
+                ShootProjectile();
             }
         }
     }
@@ -63,5 +72,25 @@ public class PlayerController : MonoBehaviour
     void LaserDestroyed()
     {
         laserActive = false;
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.layer == LayerMask.NameToLayer("Missile"))
+        {
+            if(this.killed != null)
+            {
+                this.killed.Invoke();
+            }
+
+            lives--;
+            print("Lives remaining: " + lives);
+
+            if (lives <= 0)
+            {
+                SceneManager.LoadScene("Level");
+            }
+            
+        }
     }
 }

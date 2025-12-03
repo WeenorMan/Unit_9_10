@@ -4,10 +4,12 @@ using UnityEngine.InputSystem.Processors;
 
 public class Alien : MonoBehaviour
 {
+    [Header("Alien Settings")]
     public Sprite[] animationSprites;
     public float animationTime = 1f;
-    public System.Action killed;
+    public int pointValue;
 
+    public System.Action killed;
     private SpriteRenderer spriteRenderer;
     private int animationFrame;
 
@@ -38,6 +40,7 @@ public class Alien : MonoBehaviour
         if(other.gameObject.layer == LayerMask.NameToLayer("Laser"))
         {
             this.killed.Invoke();
+            ScoreManager.instance.AddScore(this.pointValue);    
             this.gameObject.SetActive(false);
         }
     }
