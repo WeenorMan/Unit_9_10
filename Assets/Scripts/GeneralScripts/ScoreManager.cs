@@ -9,7 +9,8 @@ public class ScoreManager : MonoBehaviour
     public int score;
     public TMP_Text scoreText;
     public TMP_Text highScoreText;
-   // public TMP_Text LivesText;
+    public TMP_Text finalScoreText;
+    public TMP_Text goHighScoreText;
 
     public void Awake()
     {
@@ -40,13 +41,7 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
-    /*public void UpdateLivesText()
-    {
-        if(LivesText != null)
-        {
-            LivesText.text = " " + pc.lives;
-        }
-    }*/
+    
 
     public void HighScoreUpdate()
     {
@@ -62,6 +57,8 @@ public class ScoreManager : MonoBehaviour
             PlayerPrefs.SetInt("SavedHighScore", score);
         }
 
-        highScoreText.text = "HIGH SCORE\n " + PlayerPrefs.GetInt("SavedHighScore").ToString();
+        finalScoreText.text = "FINALSCORE " + score.ToString();
+        highScoreText.text = "HIGHSCORE\n " + PlayerPrefs.GetInt("SavedHighScore").ToString();
+        goHighScoreText.text = "HIGHSCORE " + PlayerPrefs.GetInt("SavedHighScore").ToString();
     }
 }

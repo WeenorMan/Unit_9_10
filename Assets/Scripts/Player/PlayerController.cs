@@ -5,13 +5,13 @@ public class PlayerController : MonoBehaviour
 {
     public ProjectileLogic laserPrefab;
     PlayerControls playerControls;
+    LivesManager livesManager;
     ScoreManager scoreManager;
     private bool laserActive;
     public System.Action killed;
 
     [Header("Player Settings")]
     public float speed;
-    public int lives = 2;
 
     [Header("Weapon Settings")]
     public float cooldown;
@@ -64,7 +64,7 @@ public class PlayerController : MonoBehaviour
             ProjectileLogic projectile = Instantiate(this.laserPrefab, this.transform.position, Quaternion.identity);
             projectile.destroyed += LaserDestroyed;
             laserActive = true;
-            AudioManager.instance.PlaySFXClip(0, 1);
+            AudioManager.instance.PlaySFXClip(0, 0.5f);
             lastShot = Time.time;
         }
     }
@@ -83,15 +83,7 @@ public class PlayerController : MonoBehaviour
                 this.killed.Invoke();
             }
 
-            lives--;
-            ScoreManager.instance.UpdateLivesText();
-            print("Lives remaining: " + lives);
-
-            if (lives <= 0)
-            {
-                AudioManager.instance.PlaySFXClip(4, 1);
-                SceneManager.LoadScene("Level");
-            }
+            LivesManager.instance.LoseLife();
             
         }
     }

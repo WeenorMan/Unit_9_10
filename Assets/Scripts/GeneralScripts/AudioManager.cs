@@ -1,6 +1,4 @@
-using System;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 
 public class AudioManager : MonoBehaviour
@@ -47,27 +45,44 @@ public class AudioManager : MonoBehaviour
         SFXSource.PlayOneShot(clip, volume);
     }
 
-    
+
     public void PlayMusicClip(int index, float volume)
     {
-        AudioClip clip = null;
+        if (index < 0 || index >= musicClips.Length) return;
+        if (musicClips[index] == null) return;
 
-        for (int i = 0; i < musicClips.Length; i++)
-        {
-            if (i == index)
-            {
-                if (musicClips[i] == null) return;
+        AudioClip clip = musicClips[index];
 
-                clip = musicClips[i];
-                break;
-            }
-        }
+        musicSource.clip = clip;
+        musicSource.volume = volume;
+        musicSource.loop = true;      
+        musicSource.playOnAwake = false;
 
-        musicSource.PlayOneShot(clip,volume);
+        musicSource.Play();           
     }
+
+    public void PauseMusicClip()
+    {
+        if (musicSource.isPlaying)
+        {
+            musicSource.Pause();
+        }
+    }
+
+    public void UnPauseMusicClip()
+    {
+        if (!musicSource.isPlaying)
+        {
+            musicSource.UnPause();
+        }
+    }
+
     public void StopMusicClip()
     {
-        
+        if (musicSource.isPlaying)
+        {
+            musicSource.Stop();
+        }
     }
 
 
