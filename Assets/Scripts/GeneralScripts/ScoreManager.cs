@@ -3,10 +3,13 @@ using TMPro;
 
 public class ScoreManager : MonoBehaviour
 {
+    public PlayerController pc;
+
     public static ScoreManager instance;
     public int score;
     public TMP_Text scoreText;
     public TMP_Text highScoreText;
+   // public TMP_Text LivesText;
 
     public void Awake()
     {
@@ -36,6 +39,14 @@ public class ScoreManager : MonoBehaviour
             scoreText.text = "SCORE\n " + score.ToString();
         }
     }
+
+    /*public void UpdateLivesText()
+    {
+        if(LivesText != null)
+        {
+            LivesText.text = " " + pc.lives;
+        }
+    }*/
 
     public void HighScoreUpdate()
     {

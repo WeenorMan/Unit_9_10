@@ -40,6 +40,7 @@ public class Alien : MonoBehaviour
         if(other.gameObject.layer == LayerMask.NameToLayer("Laser"))
         {
             this.killed.Invoke();
+            AudioManager.instance.PlaySFXClip(3, 0.50f);
             ScoreManager.instance.AddScore(this.pointValue);    
             this.gameObject.SetActive(false);
         }

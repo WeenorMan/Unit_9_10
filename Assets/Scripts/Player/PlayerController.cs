@@ -84,10 +84,12 @@ public class PlayerController : MonoBehaviour
             }
 
             lives--;
+            ScoreManager.instance.UpdateLivesText();
             print("Lives remaining: " + lives);
 
             if (lives <= 0)
             {
+                AudioManager.instance.PlaySFXClip(4, 1);
                 SceneManager.LoadScene("Level");
             }
             
