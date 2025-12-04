@@ -1,35 +1,55 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SocialPlatforms.Impl;
-
 
 public class AlienManager : MonoBehaviour
 {
+    // ---------------------------------------------------------
+    // Inspector Settings
+    // ---------------------------------------------------------
+
     [Header("Alien Settings")]
+    [Tooltip("Alien prefabs, one per row.")]
     public Alien[] prefabs;
-    public int rows = 5;
-    public int columns = 6;
-    public float speed = 0.0001f;
-    public float intervalTimer = 0.0f;
+
+    [Range(1, 10)] public int rows = 5;
+    [Range(1, 12)] public int columns = 6;
+
+    [Tooltip("Movement interval, lower = faster.")]
+    public float speed = 0.04f;
+
+    private float intervalTimer = 0f;
 
     [Header("Attack Settings")]
-    public float missileAttackRate = 1.0f;
+    [Tooltip("Seconds between alien missile attack attempts.")]
+    public float missileAttackRate = 1f;
+
     public ProjectileLogic missilePrefab;
 
-    [Header("Game Stats")]
+    [Header("Movement Variables")]
+    [SerializeField] private float direction = 0.1f;
+    private readonly float rightLimit = 1.9f;
+    private readonly float leftLimit = -1.9f;
+
+    private bool requestDirectionChange = false;
+
+    // ---------------------------------------------------------
+    // Game State
+    // ---------------------------------------------------------
+
     public int aliensKilled { get; private set; }
-    public int amountAlive => this.totalAliens - this.aliensKilled;
+    public int amountAlive => totalAliens - aliensKilled;
     public int waveNumber { get; private set; }
     public int totalAliens => rows * columns;
-    public float percentKilled => (float)aliensKilled / (float)totalAliens;
 
-    [Header("Movement Variables")]
-    [SerializeField] float direction;
-    float rightLimit = 1.9f;
-    float leftLimit = -1.9f;
-    bool requestDirectionChange;
-    List<Alien> alienList = new List<Alien>();
-    int alienToMove = 0;
+    public float percentKilled =>
+        totalAliens > 0 ? (float)aliensKilled / totalAliens : 0f;
+
+    private List<Alien> alienList = new List<Alien>();
+    private int alienToMove = 0;
+
+    // ---------------------------------------------------------
+    // Unity Events
+    // ---------------------------------------------------------
 
     private void Awake()
     {
@@ -38,82 +58,80 @@ public class AlienManager : MonoBehaviour
 
     private void Start()
     {
-        requestDirectionChange = false;
-        alienToMove = 0;
-        speed = 0.04f; 
-
-        InvokeRepeating(nameof(MissleAttack), this.missileAttackRate, this.missileAttackRate);
+        InvokeRepeating(nameof(MissileAttack), missileAttackRate, missileAttackRate);
     }
 
     private void Update()
     {
         DoMove();
     }
-    void SpawnAliens()
+
+    // ---------------------------------------------------------
+    // Spawning
+    // ---------------------------------------------------------
+
+    private void SpawnAliens()
     {
-        for (int row = 0; row < this.rows; row++)
+        alienList.Clear();
+
+        float xSpacing = 0.6f;
+        float ySpacing = 0.6f;
+
+        float width = xSpacing * (columns - 1);
+        float height = ySpacing * (rows - 1);
+
+        Vector2 offset = new Vector2(-width * 0.5f, -height * 0.5f);
+
+        for (int row = 0; row < rows; row++)
         {
-            float width = 0.6f * (this.columns - 1);
-            float height = 0.6f * (this.columns - 1);
-            Vector2 centering = new Vector2(-width / 2, -height / 2);
+            Vector3 rowPosition = new Vector3(offset.x, offset.y + (row * ySpacing), 0f);
 
-            Vector3 rowPosition = new Vector3(centering.x, centering.y + (row * 0.6f), 0.0f);
-
-            for (int col = 0; col < this.columns; col++)
+            for (int col = 0; col < columns; col++)
             {
-                Alien alien = Instantiate(this.prefabs[row], this.transform);
+                Alien alien = Instantiate(prefabs[row], transform);
                 alien.killed += AlienKilled;
+
                 Vector3 position = rowPosition;
-                position.x += col * 0.6f;
+                position.x += col * xSpacing;
+
                 alien.transform.localPosition = position;
                 alienList.Add(alien);
             }
         }
     }
 
-    void DoMove()
+    // ---------------------------------------------------------
+    // Movement
+    // ---------------------------------------------------------
+
+    private void DoMove()
     {
         intervalTimer -= Time.deltaTime;
-        if (intervalTimer < 0)
-        {
-            intervalTimer = speed;
-        }
-        else
-        {
-            return;
-        }
+        if (intervalTimer >= 0) return;
 
+        intervalTimer = speed;
         if (alienList.Count == 0) return;
 
-        Alien alien;
-        
-        alien = alienList[alienToMove];
+        // Move currently selected alien
+        Alien alien = alienList[alienToMove];
 
-        alien.transform.localPosition = new Vector3(
-            alien.transform.localPosition.x + direction,
-            alien.transform.localPosition.y,
-            0
-        );
+        alien.transform.localPosition += new Vector3(direction, 0, 0);
 
-        if (alien.transform.localPosition.x >= rightLimit || alien.transform.localPosition.x <= leftLimit)
+        // Check for limits
+        if (alien.transform.localPosition.x >= rightLimit ||
+            alien.transform.localPosition.x <= leftLimit)
         {
             requestDirectionChange = true;
         }
 
-        while(true)
-        { 
-            alienToMove++;
-            if( alienToMove >= alienList.Count )
-            {
+        // Find next active alien
+        while (++alienToMove < alienList.Count)
+        {
+            if (alienList[alienToMove].gameObject.activeSelf)
                 break;
-            }
-            alien = alienList[alienToMove];
-            if (alien.gameObject.activeSelf)
-            {
-                break;
-            }
         }
 
+        // End of list → reset and possibly descend
         if (alienToMove >= alienList.Count)
         {
             alienToMove = 0;
@@ -131,29 +149,36 @@ public class AlienManager : MonoBehaviour
         }
     }
 
-    private void MissleAttack()
+    // ---------------------------------------------------------
+    // Attacks
+    // ---------------------------------------------------------
+
+    private void MissileAttack()
     {
         foreach (Alien a in alienList)
         {
-            if (!a.gameObject.activeInHierarchy )
-            {
+            if (!a.gameObject.activeInHierarchy)
                 continue;
-            }
 
-            if(Random.value < (1.0f / (float)this.amountAlive))
+            if (Random.value < (1f / amountAlive))
             {
-                Instantiate(this.missilePrefab, a.transform.position, Quaternion.identity);
+                Instantiate(missilePrefab, a.transform.position, Quaternion.identity);
                 break;
             }
         }
     }
 
-    public void AlienKilled()
+    // ---------------------------------------------------------
+    // Kill & Wave Handling
+    // ---------------------------------------------------------
+
+    private void AlienKilled()
     {
         aliensKilled++;
 
-        speed *= 0.9f;
-        speed = Mathf.Max(0.01f, speed - 0.01f);
+        // Speed ramp-up
+        float difficultyFactor = percentKilled * (1f + waveNumber * 0.1f);
+        speed = Mathf.Lerp(0.04f, 0.005f, difficultyFactor);
 
         if (aliensKilled >= totalAliens)
         {
@@ -161,35 +186,19 @@ public class AlienManager : MonoBehaviour
 
             foreach (Alien a in alienList)
             {
-                if (a != null)
-                {
-                    Destroy(a.gameObject);
-                }
+                if (a != null) Destroy(a.gameObject);
             }
-            alienList.Clear();
 
             waveNumber++;
+            aliensKilled = 0;
+            alienToMove = 0;
+            missileAttackRate *= 0.9f;
+            missileAttackRate = Mathf.Max(0.1f, missileAttackRate);
 
             speed = 0.04f;
             direction = 0.1f;
 
-            aliensKilled = 0;
-            alienToMove = 0;
-
             SpawnAliens();
         }
-    }
-
-    private void OnGUI()
-    {
-        string text = " ";
-
-        text += "\nFPS:" + 1/Time.deltaTime;
-
-        // define debug text area
-        GUI.contentColor = Color.white;
-        GUILayout.BeginArea(new Rect(10f, 10f, 1600f, 1600f));
-        GUILayout.Label($"<size=24>{text}</size>");
-        GUILayout.EndArea();
     }
 }

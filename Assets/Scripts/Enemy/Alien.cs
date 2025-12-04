@@ -1,49 +1,106 @@
-using System.Runtime.CompilerServices;
+using System;
+using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem.Processors;
 
 public class Alien : MonoBehaviour
 {
+    // ---------------------------------------------------------
+    // Inspector Settings
+    // ---------------------------------------------------------
+
     [Header("Alien Settings")]
+    [Tooltip("Frames used for the alien's simple 2-frame animation.")]
     public Sprite[] animationSprites;
+
+    [Tooltip("Sprite shown when the alien is killed.")]
+    public Sprite deathSprite;
+
+    [Tooltip("Time between animation frame swaps.")]
     public float animationTime = 1f;
+
+    [Tooltip("Points awarded when this alien is killed.")]
     public int pointValue;
 
-    public System.Action killed;
+    // ---------------------------------------------------------
+    // Exposed Events
+    // ---------------------------------------------------------
+
+    public Action killed;
+
+    // ---------------------------------------------------------
+    // Private Fields
+    // ---------------------------------------------------------
+
     private SpriteRenderer spriteRenderer;
-    private int animationFrame;
+    private int animationFrame = 0;
+
+    // ---------------------------------------------------------
+    // Unity Events
+    // ---------------------------------------------------------
 
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    void Start()
+    private void Start()
     {
-        InvokeRepeating(nameof(AnimateSprite), this.animationTime, this.animationTime);
+        InvokeRepeating(nameof(AnimateSprite), animationTime, animationTime);
     }
+
+    // ---------------------------------------------------------
+    // Animation
+    // ---------------------------------------------------------
 
     private void AnimateSprite()
     {
         animationFrame++;
 
-        if (animationFrame >= this.animationSprites.Length)
-        {
+        if (animationFrame >= animationSprites.Length)
             animationFrame = 0;
-        }
 
-        spriteRenderer.sprite = this.animationSprites[animationFrame];
+        spriteRenderer.sprite = animationSprites[animationFrame];
     }
+
+    // ---------------------------------------------------------
+    // Collision Handling
+    // ---------------------------------------------------------
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if(other.gameObject.layer == LayerMask.NameToLayer("Laser"))
+        int layer = other.gameObject.layer;
+
+        if (layer == LayerMask.NameToLayer("Laser"))
         {
-            this.killed.Invoke();
-            AudioManager.instance.PlaySFXClip(3, 0.50f);
-            ScoreManager.instance.AddScore(this.pointValue);    
-            this.gameObject.SetActive(false);
+            HandleLaserHit();
+        }
+        else if (layer == LayerMask.NameToLayer("Bottom"))
+        {
+            LivesManager.instance.InstaDeath();
         }
     }
-}
 
+    private void HandleLaserHit()
+    {
+        CancelInvoke(nameof(AnimateSprite));
+
+        spriteRenderer.sprite = deathSprite;
+
+        ScoreManager.instance.AddScore(pointValue);
+        AudioManager.instance.PlaySFXClip(3, 0.50f);
+
+        killed?.Invoke();
+
+        StartCoroutine(DeactivateAfterSeconds(0.3f));
+    }
+
+    // ---------------------------------------------------------
+    // Death Handling
+    // ---------------------------------------------------------
+
+    private IEnumerator DeactivateAfterSeconds(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        gameObject.SetActive(false);
+    }
+}

@@ -10,14 +10,14 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Base
   - Water
   - UI
   - Player
   - Alien
   - Laser
   - Missile
-  - 
+  - Bottom
   - 
   - 
   - 

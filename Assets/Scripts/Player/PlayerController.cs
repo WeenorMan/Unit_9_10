@@ -1,90 +1,137 @@
+using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
-    public ProjectileLogic laserPrefab;
-    PlayerControls playerControls;
-    LivesManager livesManager;
-    ScoreManager scoreManager;
-    private bool laserActive;
-    public System.Action killed;
-
     [Header("Player Settings")]
     public float speed;
 
+
     [Header("Weapon Settings")]
+    public ProjectileLogic laserPrefab;
     public float cooldown;
-    float lastShot;
+
+    [Header("Death Visual Settings")]
+    public Sprite deathSprite;
+    public float flashTime = 0.7f;
+    public float flashSpeed = 0.1f;
+
+    // References  
+    private PlayerControls playerControls;
+    private SpriteRenderer sr;
+    private Sprite normalSprite;
+
+    // Gameplay state  
+    private bool laserActive;
+    private float lastShot;
+    private bool isDying;
+
+    // Screen boundaries  
+    private float screenLeft;
+    private float screenRight;
+    private float playerWidth;
+
+    public System.Action killed;
 
     void Start()
     {
-        if(PlayerControls.instance == null)
-        {
-            playerControls = FindFirstObjectByType<PlayerControls>();
-        }
-        else
-        {
-            playerControls = PlayerControls.instance;
-        }
+        playerControls = PlayerControls.instance ?? FindFirstObjectByType<PlayerControls>();
+
+        sr = GetComponent<SpriteRenderer>();
+        normalSprite = sr.sprite;
+
+        playerWidth = sr.bounds.extents.x;
+
+        float distanceZ = Mathf.Abs(Camera.main.transform.position.z - transform.position.z);
+        screenLeft = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, distanceZ)).x + playerWidth;
+        screenRight = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, 0, distanceZ)).x - playerWidth;
     }
-  
+
     void Update()
     {
-        if (playerControls != null)
-        {
-            if (playerControls.rightPress)
-            {
-                this.transform.position += Vector3.right * this.speed * Time.deltaTime;
-            }
-            if (playerControls.leftPress)
-            {
-                this.transform.position += Vector3.left * this.speed * Time.deltaTime;
-            }
-        }
+        if (isDying) return;
 
-        if (playerControls != null)
-        {
-            if (playerControls.actionPress)
-            {
-                if (Time.time - lastShot < cooldown)
-                {
-                    return;
-                }
-                
-                ShootProjectile();
-            }
-        }
+        HandleMovement();
+        HandleShooting();
+        ClampPosition();
     }
 
-    void ShootProjectile()
+    private void HandleMovement()
     {
-        if (!laserActive)
-        {
-            ProjectileLogic projectile = Instantiate(this.laserPrefab, this.transform.position, Quaternion.identity);
-            projectile.destroyed += LaserDestroyed;
-            laserActive = true;
-            AudioManager.instance.PlaySFXClip(0, 0.5f);
-            lastShot = Time.time;
-        }
+        if (playerControls == null) return;
+
+        Vector3 direction = Vector3.zero;
+        if (playerControls.rightPress) direction += Vector3.right;
+        if (playerControls.leftPress) direction += Vector3.left;
+
+        transform.position += direction * speed * Time.deltaTime;
     }
 
-    void LaserDestroyed()
+    private void HandleShooting()
     {
-        laserActive = false;
+        if (playerControls == null || !playerControls.actionPress) return;
+
+        if (Time.time - lastShot >= cooldown)
+            ShootProjectile();
     }
+
+    private void ClampPosition()
+    {
+        Vector3 pos = transform.position;
+        pos.x = Mathf.Clamp(pos.x, screenLeft, screenRight);
+        transform.position = pos;
+    }
+
+    private void ShootProjectile()
+    {
+        if (laserActive) return;
+
+        ProjectileLogic projectile = Instantiate(laserPrefab, transform.position, Quaternion.identity);
+        projectile.destroyed += LaserDestroyed;
+        laserActive = true;
+
+        AudioManager.instance.PlaySFXClip(0, 0.5f);
+        lastShot = Time.time;
+    }
+
+    private void LaserDestroyed() => laserActive = false;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Missile"))
         {
-            if(this.killed != null)
-            {
-                this.killed.Invoke();
-            }
-
+            killed?.Invoke();
+            StartCoroutine(PlayDeathEffect());
             LivesManager.instance.LoseLife();
-            
+        }
+
+        if (other.gameObject.layer == LayerMask.NameToLayer("Alien"))
+        {
+            killed?.Invoke();
+            StartCoroutine(PlayDeathEffect());
+            LivesManager.instance.InstaDeath();
         }
     }
+
+    private IEnumerator PlayDeathEffect()
+    {
+        isDying = true;
+        float timer = 0f;
+
+        while (timer < flashTime)
+        {
+            sr.enabled = !sr.enabled;
+            yield return new WaitForSeconds(flashSpeed);
+            timer += flashSpeed;
+        }
+
+        sr.enabled = false;
+        yield return new WaitForSeconds(0.5f);
+
+        sr.sprite = normalSprite;
+        sr.enabled = true;
+        isDying = false;
+    }  
+
+
 }

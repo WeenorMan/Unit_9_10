@@ -8,7 +8,7 @@ public class ProjectileLogic : MonoBehaviour
 
     void Update()
     {
-        this.transform.position += this.direction * this.speed * Time.deltaTime;
+        this.transform.position += this.speed * Time.deltaTime * this.direction;
     }
 
     private void OnTriggerEnter2D(Collider2D other)

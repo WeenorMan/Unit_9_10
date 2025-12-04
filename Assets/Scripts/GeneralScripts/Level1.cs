@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -29,4 +30,6 @@ public class Level1 : MonoBehaviour
         AudioManager.instance.UnPauseMusicClip();
         pauseMenu.SetActive(false);
     }
+
+   
 }

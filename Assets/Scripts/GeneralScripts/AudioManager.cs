@@ -1,14 +1,30 @@
 using UnityEngine;
 
-
 public class AudioManager : MonoBehaviour
 {
+    // ---------------------------------------------------------
+    // Singleton
+    // ---------------------------------------------------------
+
     public static AudioManager instance;
 
-    [SerializeField] private AudioClip[] musicClips, SFXClips;
-    [SerializeField] private AudioSource musicSource, SFXSource; 
+    // ---------------------------------------------------------
+    // Inspector Fields
+    // ---------------------------------------------------------
 
-    void Awake()
+    [Header("Audio Clips")]
+    [SerializeField] private AudioClip[] musicClips;
+    [SerializeField] private AudioClip[] SFXClips;
+
+    [Header("Audio Sources")]
+    [SerializeField] private AudioSource musicSource;
+    [SerializeField] private AudioSource SFXSource;
+
+    // ---------------------------------------------------------
+    // Unity Lifecycle
+    // ---------------------------------------------------------
+
+    private void Awake()
     {
         if (instance == null)
         {
@@ -18,75 +34,58 @@ public class AudioManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return;
         }
-
     }
 
-    private void Start()
-    {
-
-    }
+    // ---------------------------------------------------------
+    // SFX Playback
+    // ---------------------------------------------------------
 
     public void PlaySFXClip(int index, float volume)
     {
-        AudioClip clip = null; 
+        if (index < 0 || index >= SFXClips.Length) return;
 
-        for(int i = 0; i < SFXClips.Length; i++)
-        {
-            if (i == index)
-            {
-                if (SFXClips[i] == null) return;
-
-                clip = SFXClips[i];
-                break;
-            }
-        }
+        AudioClip clip = SFXClips[index];
+        if (clip == null) return;
 
         SFXSource.PlayOneShot(clip, volume);
     }
 
+    // ---------------------------------------------------------
+    // Music Playback
+    // ---------------------------------------------------------
 
     public void PlayMusicClip(int index, float volume)
     {
         if (index < 0 || index >= musicClips.Length) return;
-        if (musicClips[index] == null) return;
 
         AudioClip clip = musicClips[index];
+        if (clip == null) return;
 
         musicSource.clip = clip;
         musicSource.volume = volume;
-        musicSource.loop = true;      
+        musicSource.loop = true;
         musicSource.playOnAwake = false;
 
-        musicSource.Play();           
+        musicSource.Play();
     }
 
     public void PauseMusicClip()
     {
         if (musicSource.isPlaying)
-        {
             musicSource.Pause();
-        }
     }
 
     public void UnPauseMusicClip()
     {
         if (!musicSource.isPlaying)
-        {
             musicSource.UnPause();
-        }
     }
 
     public void StopMusicClip()
     {
         if (musicSource.isPlaying)
-        {
             musicSource.Stop();
-        }
     }
-
-
-
 }
-
-

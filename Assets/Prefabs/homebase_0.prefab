@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 6447255608556496932}
   - component: {fileID: 3068455535805813816}
   - component: {fileID: 9198020289741066208}
-  m_Layer: 0
+  - component: {fileID: 1119003513388193967}
+  m_Layer: 3
   m_Name: homebase_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -137,3 +138,17 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.1807752, y: 0.16139543}
   m_EdgeRadius: 0
+--- !u!114 &1119003513388193967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6177637851799335796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b75e8b56a3a413749b4c31e8f30f2d5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BaseManager
+  damageRadius: 6
+  sr: {fileID: 3068455535805813816}
