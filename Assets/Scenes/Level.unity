@@ -1753,7 +1753,7 @@ MonoBehaviour:
   - {fileID: 5059412815766601539, guid: e8d7ed1b5eb8f114d8671a2c27b7f30b, type: 3}
   rows: 5
   columns: 6
-  speed: 0.0001
+  speed: 0.04
   missileAttackRate: 1.5
   missilePrefab: {fileID: -1385186667864905727, guid: 49b749488692d514eb6baec2f1da8d9e, type: 3}
   direction: 0.1
@@ -2132,7 +2132,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -272.5, y: -98.3}
+  m_AnchoredPosition: {x: -272.5, y: -98.299805}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &945827100

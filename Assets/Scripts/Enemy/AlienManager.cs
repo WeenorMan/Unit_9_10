@@ -38,11 +38,11 @@ public class AlienManager : MonoBehaviour
 
     public int aliensKilled { get; private set; }
     public int amountAlive => totalAliens - aliensKilled;
-    public int waveNumber { get; private set; }
+    public int waveNumber; //{ get; private set; }
     public int totalAliens => rows * columns;
 
     public float percentKilled =>
-        totalAliens > 0 ? (float)aliensKilled / totalAliens : 0f;
+        totalAliens > 0 ? (float)aliensKilled / totalAliens : 0;
 
     private List<Alien> alienList = new List<Alien>();
     private int alienToMove = 0;
@@ -177,8 +177,12 @@ public class AlienManager : MonoBehaviour
         aliensKilled++;
 
         // Speed ramp-up
-        float difficultyFactor = percentKilled * (1f + waveNumber * 0.1f);
-        speed = Mathf.Lerp(0.04f, 0.005f, difficultyFactor);
+        float difficultyFactor = percentKilled * (1f + waveNumber * 0.9f);
+        speed = Mathf.Lerp(0.04f, 0.001f, difficultyFactor);
+
+
+        Debug.Log($"DF: {difficultyFactor} Speed: {speed}");
+
 
         if (aliensKilled >= totalAliens)
         {
@@ -190,6 +194,7 @@ public class AlienManager : MonoBehaviour
             }
 
             waveNumber++;
+            Debug.Log("wave number = " + waveNumber);
             aliensKilled = 0;
             alienToMove = 0;
             missileAttackRate *= 0.9f;

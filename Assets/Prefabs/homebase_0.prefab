@@ -81,7 +81,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 5138945754443311151, guid: 578e96e19dfacc74b985e25587a2aad7, type: 3}
+  m_Sprite: {fileID: 3671275840422558638, guid: 72718bcc5eb44d049947961d1cae3fa4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -130,7 +130,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.2, y: 0.18}
+    oldSize: {x: 0.32, y: 0.32}
     newSize: {x: 0.2, y: 0.18}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -150,5 +150,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b75e8b56a3a413749b4c31e8f30f2d5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BaseManager
-  damageRadius: 6
-  sr: {fileID: 3068455535805813816}
+  sprites:
+  - {fileID: 21300000, guid: dcb30410788790c4da2a90b36a3fa59d, type: 3}
+  - {fileID: -4832519036913482062, guid: 72718bcc5eb44d049947961d1cae3fa4, type: 3}
+  - {fileID: 648130045709642811, guid: 72718bcc5eb44d049947961d1cae3fa4, type: 3}
+  - {fileID: -4674311986491763615, guid: 72718bcc5eb44d049947961d1cae3fa4, type: 3}
+  - {fileID: -554213844672862943, guid: 72718bcc5eb44d049947961d1cae3fa4, type: 3}
+  - {fileID: 8151797568281284183, guid: 72718bcc5eb44d049947961d1cae3fa4, type: 3}
+  - {fileID: -3748471198330941832, guid: 72718bcc5eb44d049947961d1cae3fa4, type: 3}
+  - {fileID: -2196765009184885855, guid: 72718bcc5eb44d049947961d1cae3fa4, type: 3}
+  - {fileID: 5268738984493735709, guid: 72718bcc5eb44d049947961d1cae3fa4, type: 3}
+  - {fileID: 3671275840422558638, guid: 72718bcc5eb44d049947961d1cae3fa4, type: 3}
+  health: 10
