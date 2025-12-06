@@ -3,9 +3,6 @@ using UnityEngine;
 
 public class AlienManager : MonoBehaviour
 {
-    // ---------------------------------------------------------
-    // Inspector Settings
-    // ---------------------------------------------------------
 
     [Header("Alien Settings")]
     [Tooltip("Alien prefabs, one per row.")]
@@ -32,9 +29,7 @@ public class AlienManager : MonoBehaviour
 
     private bool requestDirectionChange = false;
 
-    // ---------------------------------------------------------
-    // Game State
-    // ---------------------------------------------------------
+    
 
     public int aliensKilled { get; private set; }
     public int amountAlive => totalAliens - aliensKilled;
@@ -47,9 +42,7 @@ public class AlienManager : MonoBehaviour
     private List<Alien> alienList = new List<Alien>();
     private int alienToMove = 0;
 
-    // ---------------------------------------------------------
-    // Unity Events
-    // ---------------------------------------------------------
+    
 
     private void Awake()
     {
@@ -66,9 +59,7 @@ public class AlienManager : MonoBehaviour
         DoMove();
     }
 
-    // ---------------------------------------------------------
-    // Spawning
-    // ---------------------------------------------------------
+    
 
     private void SpawnAliens()
     {
@@ -100,9 +91,7 @@ public class AlienManager : MonoBehaviour
         }
     }
 
-    // ---------------------------------------------------------
-    // Movement
-    // ---------------------------------------------------------
+    
 
     private void DoMove()
     {
@@ -149,9 +138,7 @@ public class AlienManager : MonoBehaviour
         }
     }
 
-    // ---------------------------------------------------------
-    // Attacks
-    // ---------------------------------------------------------
+    
 
     private void MissileAttack()
     {
@@ -168,10 +155,7 @@ public class AlienManager : MonoBehaviour
         }
     }
 
-    // ---------------------------------------------------------
-    // Kill & Wave Handling
-    // ---------------------------------------------------------
-
+    
     private void AlienKilled()
     {
         aliensKilled++;
